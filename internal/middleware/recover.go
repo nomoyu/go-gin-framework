@@ -16,7 +16,7 @@ func RecoveryMiddleware() gin.HandlerFunc {
 		defer func() {
 			if rec := recover(); rec != nil {
 				// 打印堆栈错误日志
-				logger.Errorf("panic recovered: " + formatRecover(rec))
+				logger.Error("panic recovered: " + formatRecover(rec))
 
 				// 返回统一错误响应
 				c.AbortWithStatusJSON(http.StatusOK, response.Response[any]{

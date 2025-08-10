@@ -1,8 +1,8 @@
 package nomoyu
 
 import (
+	"github.com/nomoyu/go-gin-framework/internal/logger"
 	"github.com/nomoyu/go-gin-framework/pkg/config"
-	"github.com/nomoyu/go-gin-framework/pkg/logger"
 )
 
 type LogOption struct {
