@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/nomoyu/go-gin-framework/internal/middleware"
 	"github.com/nomoyu/go-gin-framework/pkg/config"
+	"github.com/nomoyu/go-gin-framework/pkg/logger"
 )
 
 type ServerOption struct {
@@ -40,7 +41,7 @@ func (a *App) Run(addr ...string) {
 		port = fmt.Sprintf(":%d", config.Conf.Server.Port)
 	}
 
-	fmt.Println("✅ 配置初始化完成 " + port)
+	logger.Infof("✅ 配置初始化完成 " + port)
 	// 自定义日志格式
 	//a.engine.DebugPrintRouteFunc = func(httpMethod, absolutePath, handlerName string, nuHandlers int) {
 	//	log.Printf("endpoint %v %v %v %v\n", httpMethod, absolutePath, handlerName, nuHandlers)

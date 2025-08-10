@@ -87,5 +87,5 @@ func InitConfig() {
 	}
 
 	Conf = &config
-	log.Println("✅ 配置初始化完成")
+	log.Println("config success init...")
 }

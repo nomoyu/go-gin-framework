@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/nomoyu/go-gin-framework/pkg/config"
 	"github.com/nomoyu/go-gin-framework/pkg/db"
+	"github.com/nomoyu/go-gin-framework/pkg/logger"
 	"time"
 )
 
@@ -52,16 +53,16 @@ func initDBIfPresent(a *App) {
 		if err := db.Init(opt); err != nil {
 			fmt.Println("❌ 数据库初始化失败(配置):", err)
 		} else {
-			fmt.Println("✅ 数据库连接成功(配置)")
+			logger.Info("✅ 数据库连接成功(配置)")
 			if !conf.AutoMigrate {
 				return
 			}
 			err := db.AutoMigrate()
 			if err != nil {
-				fmt.Printf("❌ AutoMigrate 失败: %v", err)
+				logger.Infof("❌ AutoMigrate 失败: %v", err)
 				return
 			}
-			fmt.Println("✅ 数据库迁移成功")
+			logger.Info("✅ 数据库迁移成功")
 		}
 	}
 }

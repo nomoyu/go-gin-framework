@@ -5,6 +5,7 @@ import (
 	"github.com/nomoyu/go-gin-framework/internal/auth"
 	"github.com/nomoyu/go-gin-framework/internal/middleware"
 	"github.com/nomoyu/go-gin-framework/pkg/config"
+	"github.com/nomoyu/go-gin-framework/pkg/logger"
 )
 
 type AuthConfig struct {
@@ -46,6 +47,6 @@ func initAuthIfConfigured(app *App) {
 		default:
 			fmt.Println("❌ 不支持的认证模式:", conf.Mode)
 		}
-		fmt.Println("启动鉴权成功")
+		logger.Info("启动鉴权成功")
 	}
 }

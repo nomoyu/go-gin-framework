@@ -26,6 +26,7 @@ func Start() *App {
 		routes:    []RouteGroup{},
 		logOption: nil,
 	}
+	printBanner()
 	initRemoteConfigIfPresent(app)
 	initLogFromConfigIfPresent(app)
 	initSwaggerFromConfigIfPresent(app)
