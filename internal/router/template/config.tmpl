@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>Nomoyu 配置中心</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif;
+            background-color: #f5f7fa;
+        }
+
+        .navbar {
+            background-color: #2f54eb;
+            padding: 20px;
+            color: #ffffff;
+            font-size: 24px;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 40px auto;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 8px 24px rgba(149, 157, 165, 0.2);
+            padding: 30px;
+        }
+
+        h2 {
+            color: #2f54eb;
+            border-bottom: 1px solid #f0f0f0;
+            padding-bottom: 10px;
+        }
+
+        label {
+            font-weight: bold;
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        textarea {
+            width: 100%;
+            height: 500px;
+            font-family: Menlo, Monaco, Consolas, monospace;
+            font-size: 14px;
+            padding: 15px;
+            border: 1px solid #d9d9d9;
+            border-radius: 6px;
+            resize: vertical;
+            background-color: #fefefe;
+        }
+
+        .save-btn {
+            background-color: #2f54eb;
+            color: white;
+            padding: 12px 28px;
+            font-size: 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+
+        .save-btn:hover {
+            background-color: #1d39c4;
+        }
+
+        .footer {
+            text-align: center;
+            color: #999;
+            font-size: 13px;
+            padding-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="navbar">🛠 Nomoyu 配置中心</div>
+
+    <div class="container">
+        <h2>配置文件编辑（YAML 格式）</h2>
+        <form method="post" action="/config/save">
+            <label for="config">请输入配置内容：</label>
+            <textarea id="config" name="config">{{ . }}</textarea>
+            <button type="submit" class="save-btn">💾 保存配置</button>
+        </form>
+        <div class="footer">Nomoyu Framework © 2025</div>
+    </div>
+
+</body>
+</html>

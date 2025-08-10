@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>401 Unauthorized - nomoyu-go</title>
+    <style>
+        body {
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f9fc;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            flex-direction: column;
+        }
+
+        .logo {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #2b85e4;
+            margin-bottom: 20px;
+        }
+
+        .card {
+            background: white;
+            border: 1px solid #e3e8ee;
+            border-radius: 10px;
+            padding: 30px 40px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            text-align: center;
+            max-width: 500px;
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            color: #f56c6c;
+            margin-bottom: 10px;
+        }
+
+        p {
+            font-size: 1rem;
+            color: #666;
+        }
+
+        .reason {
+            margin-top: 15px;
+            font-style: italic;
+            color: #999;
+        }
+    </style>
+</head>
+<body>
+<div class="logo">nomoyu-go 🚀</div>
+<div class="card">
+    <h1>401 未授权访问</h1>
+    <p>您无权访问此资源，请确认已正确登录。</p>
+    {{ if .Reason }}
+    <div class="reason">错误信息：{{ .Reason }}</div>
+    {{ end }}
+</div>
+</body>
+</html>

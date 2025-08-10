@@ -1,0 +1,20 @@
+app:
+  name: "GinApp"
+  env: "dev"
+  version: "0.1.0"
+
+server:
+  host: "127.0.0.1"
+  port: 8080
+
+database:
+  dialect: "mysql"
+  host: "127.0.0.1"
+  port: 3306
+  user: "root"
+  password: "password"
+  dbname: "testdb"
+
+log:
+  level: "debug"
+  path: "./logs"
