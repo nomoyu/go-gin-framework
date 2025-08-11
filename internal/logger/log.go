@@ -71,7 +71,7 @@ func InitLoggerWithConfig(logPath, level string) {
 
 	logApp = zap.New(core, zap.AddCaller(), zap.AddCallerSkip(1), zap.AddStacktrace(zap.DPanicLevel))
 	sugar = logApp.Sugar()
-	logApp.Info("✅ 日志初始化完成")
+	logApp.Info("init nomoyu log success...")
 }
 
 func mustFile(p string) zapcore.WriteSyncer {

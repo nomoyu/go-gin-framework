@@ -28,6 +28,12 @@ func initLogFromConfigIfPresent(app *App) {
 	}
 
 	conf := config.Conf.Log
+	if conf.Path == "" {
+		conf.Path = "./logs"
+	}
+	if conf.Level == "" {
+		conf.Level = "info"
+	}
 	if conf.Path != "" && conf.Level != "" {
 		app.logOption = &LogOption{
 			Path:     conf.Path,

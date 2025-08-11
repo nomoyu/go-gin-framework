@@ -45,8 +45,8 @@ func initAuthIfConfigured(app *App) {
 				FromUser: true,
 			}
 		default:
-			fmt.Println("❌ 不支持的认证模式:", conf.Mode)
+			fmt.Println("not support auth mode:", conf.Mode)
 		}
-		logger.Info("启动鉴权成功")
+		logger.Info("init nomoyu auth success...")
 	}
 }

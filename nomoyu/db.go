@@ -51,18 +51,18 @@ func initDBIfPresent(a *App) {
 		}
 		opt := db.Option{Dialect: conf.Dialect, DSN: dsn}
 		if err := db.Init(opt); err != nil {
-			fmt.Println("❌ 数据库初始化失败(配置):", err)
+			fmt.Println("init nomoyu database fail...", err)
 		} else {
-			logger.Info("✅ 数据库连接成功(配置)")
+			logger.Info("init nomoyu database success...")
 			if !conf.AutoMigrate {
 				return
 			}
 			err := db.AutoMigrate()
 			if err != nil {
-				logger.Infof("❌ AutoMigrate 失败: %v", err)
+				logger.Infof("autoMigrate fail: %v", err)
 				return
 			}
-			logger.Info("✅ 数据库迁移成功")
+			logger.Info("autoMigrate success")
 		}
 	}
 }

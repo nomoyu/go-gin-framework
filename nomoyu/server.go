@@ -41,14 +41,14 @@ func (a *App) Run(addr ...string) {
 		port = fmt.Sprintf(":%d", config.Conf.Server.Port)
 	}
 
-	logger.Infof("✅ 配置初始化完成 " + port)
+	logger.Infof("server started: " + port)
 	// 自定义日志格式
 	//a.engine.DebugPrintRouteFunc = func(httpMethod, absolutePath, handlerName string, nuHandlers int) {
 	//	log.Printf("endpoint %v %v %v %v\n", httpMethod, absolutePath, handlerName, nuHandlers)
 	//}
 
 	if err := a.engine.Run(port); err != nil {
-		fmt.Println("服务启动失败: " + err.Error())
+		fmt.Println("server started fail: " + err.Error())
 	}
 
 }

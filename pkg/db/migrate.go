@@ -9,9 +9,9 @@ func AutoMigrate() error {
 	}
 	err := d.AutoMigrate(RegisteredModels()...)
 	if err != nil {
-		logger.Errorf("AutoMigrate 失败: %v", err)
+		logger.Errorf("AutoMigrate fail: %v", err)
 		return err
 	}
-	logger.Info("✅ AutoMigrate 完成")
+	logger.Info("AutoMigrate success")
 	return nil
 }

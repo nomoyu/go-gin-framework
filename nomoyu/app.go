@@ -27,8 +27,8 @@ func Start() *App {
 		logOption: nil,
 	}
 	printBanner()
-	initRemoteConfigIfPresent(app)
 	initLogFromConfigIfPresent(app)
+	initRemoteConfigIfPresent(app)
 	initSwaggerFromConfigIfPresent(app)
 	initDBIfPresent(app)
 
