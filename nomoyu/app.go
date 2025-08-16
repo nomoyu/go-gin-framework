@@ -1,20 +1,27 @@
 package nomoyu
 
 import (
+	"context"
 	"github.com/gin-gonic/gin"
 	"github.com/nomoyu/go-gin-framework/internal/middleware"
 	"github.com/nomoyu/go-gin-framework/pkg/config"
 	"github.com/nomoyu/go-gin-framework/pkg/response"
+	"net/http"
+	"time"
 )
 
 type App struct {
-	engine       *gin.Engine
-	modules      []Module
-	routes       []RouteGroup
-	logOption    *LogOption
-	serverOption *ServerOption
-	authOption   *AuthOption
-	dbOption     *DBOption
+	engine          *gin.Engine
+	modules         []Module
+	routes          []RouteGroup
+	logOption       *LogOption
+	serverOption    *ServerOption
+	authOption      *AuthOption
+	dbOption        *DBOption
+	httpServer      *http.Server
+	shutdownTimeout time.Duration
+	shutting        int32 // 0: 正常，1: 正在关机
+	shutdownHooks   []func(ctx context.Context) error
 }
 
 func Start() *App {
