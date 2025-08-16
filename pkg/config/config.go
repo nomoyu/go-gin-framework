@@ -3,6 +3,7 @@ package config
 import (
 	"log"
 	"os"
+	"time"
 
 	"github.com/spf13/viper"
 )
@@ -15,6 +16,7 @@ type AppConfig struct {
 	Swagger  SwaggerConfig `mapstructure:"swagger"`
 	Auth     AuthConfig    `mapstructure:"auth"`
 	Config   ConfigCenter  `mapstructure:"config"`
+	Redis    RedisConfig   `mapstructure:"redis"`
 }
 
 type App struct {
@@ -36,6 +38,20 @@ type Database struct {
 	Password    string `mapstructure:"password"`
 	DBName      string `mapstructure:"dbname"`
 	AutoMigrate bool   `mapstructure:"autoMigrate"`
+}
+
+type RedisConfig struct {
+	// 模式：空或 "single" 使用单点；"cluster" 使用集群（需填写 Addrs）
+	Mode     string   `mapstructure:"mode"`
+	Addr     string   `mapstructure:"addr"`  // 单点：host:port
+	Addrs    []string `mapstructure:"addrs"` // 集群：节点列表
+	Password string   `mapstructure:"password"`
+	DB       int      `mapstructure:"db"`
+	PoolSize int      `mapstructure:"pool_size"`
+	// 可选超时（字符串形式，viper 能解析 500ms/2s/1m 等）
+	DialTimeout  time.Duration `mapstructure:"dial_timeout"`
+	ReadTimeout  time.Duration `mapstructure:"read_timeout"`
+	WriteTimeout time.Duration `mapstructure:"write_timeout"`
 }
 
 type Log struct {

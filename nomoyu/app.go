@@ -20,7 +20,8 @@ type App struct {
 	dbOption        *DBOption
 	httpServer      *http.Server
 	shutdownTimeout time.Duration
-	shutting        int32 // 0: 正常，1: 正在关机
+	redisOption     *RedisOption
+	shutting        int32
 	shutdownHooks   []func(ctx context.Context) error
 }
 
@@ -38,9 +39,11 @@ func Start() *App {
 	initRemoteConfigIfPresent(app)
 	initSwaggerFromConfigIfPresent(app)
 	initDBIfPresent(app)
+	initRedisFromConfigIfPresent(app)
 
 	app.engine.Use(
 		middleware.TraceID(),
+		middleware.RequestContext(),
 		middleware.RecoveryMiddleware(),
 		middleware.RequestLoggerMiddleware(),
 	)
