@@ -19,7 +19,7 @@ func RecoveryMiddleware() gin.HandlerFunc {
 				logger.Error("panic recovered: " + formatRecover(rec))
 
 				// 返回统一错误响应
-				c.AbortWithStatusJSON(http.StatusOK, response.Response[any]{
+				c.AbortWithStatusJSON(http.StatusOK, response.Response{
 					Code: errorcode.ServerError.Code,
 					Msg:  errorcode.ServerError.Msg,
 				})

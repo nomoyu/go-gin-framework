@@ -14,15 +14,15 @@ const (
 )
 
 // Response 通用响应结构：泛型版本
-type Response[T any] struct {
-	Code int    `json:"code"`
-	Msg  string `json:"msg"`
-	Data T      `json:"data,omitempty"` // 空值时可省略
+type Response struct {
+	Code int         `json:"code"`
+	Msg  string      `json:"msg"`
+	Data interface{} `json:"data,omitempty"` // 空值时可省略
 }
 
 // Success 成功响应（带数据）
-func Success[T any](c *gin.Context, data T) {
-	res := Response[T]{
+func Success(c *gin.Context, data any) {
+	res := Response{
 		Code: CodeSuccess,
 		Msg:  "success",
 		Data: data,
@@ -32,7 +32,7 @@ func Success[T any](c *gin.Context, data T) {
 
 // SuccessMsg 成功响应（无数据）
 func SuccessMsg(c *gin.Context, msg string) {
-	c.JSON(http.StatusOK, Response[any]{
+	c.JSON(http.StatusOK, Response{
 		Code: CodeSuccess,
 		Msg:  msg,
 	})
@@ -40,7 +40,7 @@ func SuccessMsg(c *gin.Context, msg string) {
 
 // Error 错误响应
 func Error(c *gin.Context, msg string) {
-	c.JSON(http.StatusOK, Response[any]{
+	c.JSON(http.StatusOK, Response{
 		Code: CodeError,
 		Msg:  msg,
 	})
@@ -48,7 +48,7 @@ func Error(c *gin.Context, msg string) {
 
 // Fail 自定义错误码响应
 func Fail(c *gin.Context, code int, msg string) {
-	c.JSON(http.StatusOK, Response[any]{
+	c.JSON(http.StatusOK, Response{
 		Code: code,
 		Msg:  msg,
 	})
@@ -56,7 +56,7 @@ func Fail(c *gin.Context, code int, msg string) {
 
 // FailWithCode 使用 ErrorCode 响应错误
 func FailWithCode(c *gin.Context, ec errorcode.ErrorCode) {
-	c.JSON(http.StatusOK, Response[any]{
+	c.JSON(http.StatusOK, Response{
 		Code: ec.Code,
 		Msg:  ec.Msg,
 	})
