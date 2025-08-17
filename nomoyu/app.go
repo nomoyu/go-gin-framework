@@ -23,6 +23,7 @@ type App struct {
 	redisOption     *RedisOption
 	shutting        int32
 	shutdownHooks   []func(ctx context.Context) error
+	corsOption      *CORSOption
 }
 
 func Start() *App {
@@ -40,6 +41,7 @@ func Start() *App {
 	initSwaggerFromConfigIfPresent(app)
 	initDBIfPresent(app)
 	initRedisFromConfigIfPresent(app)
+	initCORS(app)
 
 	app.engine.Use(
 		middleware.TraceID(),

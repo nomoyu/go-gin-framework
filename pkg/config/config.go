@@ -17,6 +17,7 @@ type AppConfig struct {
 	Auth     AuthConfig    `mapstructure:"auth"`
 	Config   ConfigCenter  `mapstructure:"config"`
 	Redis    RedisConfig   `mapstructure:"redis"`
+	CORS     CORS          `mapstructure:"cors"`
 }
 
 type App struct {
@@ -74,6 +75,16 @@ type AuthConfig struct {
 
 type RemoteConfig struct {
 	Addr string `mapstructure:"addr"`
+}
+
+type CORS struct {
+	Enabled          bool     `mapstructure:"enabled"`
+	AllowOrigins     []string `mapstructure:"allow_origins"`
+	AllowMethods     []string `mapstructure:"allow_methods"`
+	AllowHeaders     []string `mapstructure:"allow_headers"`
+	ExposeHeaders    []string `mapstructure:"expose_headers"`
+	AllowCredentials bool     `mapstructure:"allow_credentials"`
+	MaxAge           int      `mapstructure:"max_age"` // 秒
 }
 
 type ConfigCenter struct {
