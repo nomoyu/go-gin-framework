@@ -53,6 +53,9 @@ func (a *App) Run(addr ...string) {
 		a.shutdownTimeout = 10 * time.Second
 	}
 
+	// ✅ 启动定时任务调度（若已配置）
+	a.startScheduler()
+
 	// ✅ 关机防护中间件（建议放最前或日志/trace之后）
 	a.engine.Use(a.shutdownGuard())
 

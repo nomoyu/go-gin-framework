@@ -15,6 +15,7 @@ type App struct {
 	modules         []Module
 	routes          []RouteGroup
 	logOption       *LogOption
+	scheduler       *SchedulerOption
 	serverOption    *ServerOption
 	authOption      *AuthOption
 	dbOption        *DBOption

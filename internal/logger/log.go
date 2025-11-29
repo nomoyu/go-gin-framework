@@ -35,8 +35,6 @@ func InitLoggerWithConfig(logPath, level string) {
 		level = "info"
 	}
 	_ = os.MkdirAll(logPath, 0755)
-
-	appFile := filepath.Join(logPath, time.Now().Format("2006-01-02")+".log")
 	if err := AtomicLv.UnmarshalText([]byte(level)); err != nil {
 		AtomicLv.SetLevel(zap.InfoLevel)
 	}
@@ -71,8 +69,8 @@ func InitLoggerWithConfig(logPath, level string) {
 	fileEnc := zapcore.NewJSONEncoder(fileEncCfg)
 
 	core := zapcore.NewTee(
-		zapcore.NewCore(consoleEnc, zapcore.AddSync(os.Stdout), AtomicLv),      // 彩色控制台
-		zapcore.NewCore(fileEnc, zapcore.AddSync(mustFile(appFile)), AtomicLv), // 纯净文件
+		zapcore.NewCore(consoleEnc, zapcore.AddSync(os.Stdout), AtomicLv),    // 彩色控制台
+		zapcore.NewCore(fileEnc, newDailyFileWriteSyncer(logPath), AtomicLv), // 纯净文件
 	)
 
 	logApp = zap.New(core, zap.AddCaller(), zap.AddCallerSkip(1), zap.AddStacktrace(zap.DPanicLevel))
@@ -80,12 +78,62 @@ func InitLoggerWithConfig(logPath, level string) {
 	logApp.Info("init nomoyu log success...")
 }
 
-func mustFile(p string) zapcore.WriteSyncer {
-	f, err := os.OpenFile(p, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
-	if err != nil {
+type dailyFileWriteSyncer struct {
+	mu      sync.Mutex
+	logPath string
+	file    *os.File
+	curDate string
+}
+
+func newDailyFileWriteSyncer(logPath string) zapcore.WriteSyncer {
+	w := &dailyFileWriteSyncer{logPath: logPath}
+	if err := w.rotateIfNeeded(time.Now()); err != nil {
 		panic(err)
 	}
-	return zapcore.AddSync(f)
+	return zapcore.AddSync(w)
+}
+
+func (w *dailyFileWriteSyncer) Write(p []byte) (int, error) {
+	w.mu.Lock()
+	defer w.mu.Unlock()
+
+	if err := w.rotateIfNeeded(time.Now()); err != nil {
+		return 0, err
+	}
+
+	return w.file.Write(p)
+}
+
+func (w *dailyFileWriteSyncer) Sync() error {
+	w.mu.Lock()
+	defer w.mu.Unlock()
+
+	if w.file != nil {
+		return w.file.Sync()
+	}
+
+	return nil
+}
+
+func (w *dailyFileWriteSyncer) rotateIfNeeded(now time.Time) error {
+	date := now.Format("2006-01-02")
+	if w.file != nil && date == w.curDate {
+		return nil
+	}
+
+	if w.file != nil {
+		_ = w.file.Close()
+	}
+
+	filename := filepath.Join(w.logPath, date+".log")
+	f, err := os.OpenFile(filename, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
+	if err != nil {
+		return err
+	}
+
+	w.file = f
+	w.curDate = date
+	return nil
 }
 
 // —— caller 仅保留 “最后两级/文件.go:行号”，控制台上色，文件不加色 ——

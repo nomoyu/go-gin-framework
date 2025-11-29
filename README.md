@@ -11,6 +11,73 @@
 | `router`     | Gin 的路由分组注册，例如 `/api/v1/users`                |
 | `pkg`        | 常用工具：雪花ID生成器、密码加密、通用响应、时间格式化等                 |
 
+# ⏰ 定时任务工具
+
+内置 `pkg/scheduler` 封装了轻量级的定时任务调度，支持链式注入、统一日志、优雅停机自动停止任务。
+
+## 🚀 快速开始
+
+```go
+import (
+    "context"
+    "github.com/nomoyu/go-gin-framework/nomoyu"
+    "github.com/nomoyu/go-gin-framework/pkg/scheduler"
+)
+
+func main() {
+    nomoyu.Start().
+        WithCronTasks(
+            scheduler.Task{ // 每 30 秒执行一次
+                Name: "heartbeat",
+                Spec: "@every 30s",
+                Job: func(ctx context.Context) error {
+                    // TODO: your task logic
+                    return nil
+                },
+            },
+            scheduler.Task{ // 每天 02:30 执行
+                Name: "daily-report",
+                Spec: "@daily 02:30",
+                Job: func(ctx context.Context) error {
+                    return nil
+                },
+            },
+        ).
+        Run(":8080")
+}
+```
+
+> 任务会在应用退出时自动停止，无需手动清理。
+
+## 🧭 支持的 `Spec` 语法
+
+- 直接写持续时间：`"5m"`、`"30s"`，等价于 `@every` 间隔执行
+- 固定间隔：`@every <duration>`，如 `@every 15m`
+- 每天：`@daily`（默认 00:00）或 `@daily 02:30`、`@daily 02:30:10`
+- 每小时：`@hourly`（默认整点）或 `@hourly 15`、`@hourly 15:30`
+
+## 🎛️ 自定义调度器
+
+```go
+import (
+    "context"
+    "time"
+
+    "github.com/nomoyu/go-gin-framework/nomoyu"
+    "github.com/nomoyu/go-gin-framework/pkg/scheduler"
+)
+
+loc, _ := time.LoadLocation("Asia/Shanghai")
+custom := scheduler.New(scheduler.WithLocation(loc))
+custom.AddTask(scheduler.Task{Spec: "@every 10s", Job: func(ctx context.Context) error { return nil }})
+
+nomoyu.Start().
+    WithScheduler(custom). // 可多次调用挂载多个调度器
+    Run()
+```
+
+自定义调度器适合需要自定义时区或提前预置任务的场景；可链式追加多个调度器（例如区分业务域），框架会启动并在优雅停机时依次调用所有调度器的 `Stop` 等待任务结束。
+
 
 # 🌐 nomoyu 路由模块说明文档（RouteGroup）
 
