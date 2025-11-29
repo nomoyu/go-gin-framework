@@ -41,7 +41,7 @@ func InitLoggerWithConfig(logPath, level string) {
 		AtomicLv.SetLevel(zap.InfoLevel)
 	}
 
-	// --- 两套 Encoder：控制台彩色，文件纯净 ---
+	// --- 两套 Encoder：控制台彩色并对齐，文件 JSON 便于采集 ---
 	consoleEncCfg := zapcore.EncoderConfig{
 		TimeKey:        "time",
 		LevelKey:       "level",
@@ -50,19 +50,25 @@ func InitLoggerWithConfig(logPath, level string) {
 		MessageKey:     "msg",
 		StacktraceKey:  "stack",
 		EncodeTime:     zapcore.TimeEncoderOfLayout("2006-01-02 15:04:05.000"),
-		EncodeLevel:    zapcore.CapitalColorLevelEncoder, // 👈 级别自带颜色
-		EncodeCaller:   encodeCallerColor,                // 👈 caller 上色
+		EncodeLevel:    encodeLevelColorAligned, // 👈 级别彩色且固定宽度
+		EncodeCaller:   encodeCallerColor,       // 👈 caller 上色
 		EncodeDuration: zapcore.StringDurationEncoder,
 	}
-	fileEncCfg := consoleEncCfg
-	fileEncCfg.EncodeLevel = func(l zapcore.Level, enc zapcore.PrimitiveArrayEncoder) {
-		enc.AppendString(fmt.Sprintf("%-5s", strings.ToUpper(l.String())))
+	fileEncCfg := zapcore.EncoderConfig{
+		TimeKey:        "time",
+		LevelKey:       "level",
+		NameKey:        "trace",
+		CallerKey:      "caller",
+		MessageKey:     "msg",
+		StacktraceKey:  "stack",
+		EncodeTime:     zapcore.TimeEncoderOfLayout(time.RFC3339Nano),
+		EncodeLevel:    encodeLevelAligned,
+		EncodeCaller:   encodeCallerPlain,
+		EncodeDuration: zapcore.StringDurationEncoder,
 	}
-	fileEncCfg.EncodeCaller = encodeCallerPlain
-	fileEncCfg.EncodeDuration = zapcore.StringDurationEncoder
 
 	consoleEnc := zapcore.NewConsoleEncoder(consoleEncCfg)
-	fileEnc := zapcore.NewConsoleEncoder(fileEncCfg)
+	fileEnc := zapcore.NewJSONEncoder(fileEncCfg)
 
 	core := zapcore.NewTee(
 		zapcore.NewCore(consoleEnc, zapcore.AddSync(os.Stdout), AtomicLv),      // 彩色控制台
@@ -97,6 +103,30 @@ func encodeCallerColor(c zapcore.EntryCaller, enc zapcore.PrimitiveArrayEncoder)
 	const reset = "\x1b[0m"
 	enc.AppendString(cyan + short2(c.TrimmedPath()) + reset)
 }
+
+func encodeLevelAligned(l zapcore.Level, enc zapcore.PrimitiveArrayEncoder) {
+	enc.AppendString(fmt.Sprintf("%-5s", strings.ToUpper(l.String())))
+}
+
+func encodeLevelColorAligned(l zapcore.Level, enc zapcore.PrimitiveArrayEncoder) {
+	const reset = "\x1b[0m"
+	var color string
+	switch l {
+	case zap.DebugLevel:
+		color = "\x1b[36m" // cyan
+	case zap.InfoLevel:
+		color = "\x1b[32m" // green
+	case zap.WarnLevel:
+		color = "\x1b[33m" // yellow
+	case zap.ErrorLevel:
+		color = "\x1b[31m" // red
+	case zap.DPanicLevel, zap.PanicLevel, zap.FatalLevel:
+		color = "\x1b[35m" // magenta
+	default:
+		color = ""
+	}
+	enc.AppendString(color + fmt.Sprintf("%-5s", strings.ToUpper(l.String())) + reset)
+}
 func short2(path string) string {
 	parts := strings.Split(path, "/")
 	if len(parts) >= 2 {
@@ -108,7 +138,7 @@ func short2(path string) string {
 // BindTraceForRequest —— 绑定 traceId：把 traceId 放到 Name 列 ——
 // 中间件里调用 bind/unbind，让后续 logger.Info 自动带 traceId
 func BindTraceForRequest(traceID string) func() {
-	l := logApp.Named(traceID)
+	l := CurLogger().Named(traceID)
 	gid := curGID()
 	reqBind.Store(gid, l)
 	return func() { reqBind.Delete(gid) }
@@ -145,8 +175,20 @@ func S() *zap.SugaredLogger { return CurSugar() }
 
 // WithTrace 兼容旧用法：手动加 trace
 func WithTrace(ctx context.Context) *zap.SugaredLogger {
+	return FromContext(ctx).Sugar()
+}
+
+// FromContext 返回携带 traceID 的 logger，优先使用当前请求绑定的 logger
+// （确保链路字段在 Name 列展示，同时避免未初始化 logApp 时的空指针）。
+func FromContext(ctx context.Context) *zap.Logger {
+	if ctx == nil {
+		return CurLogger()
+	}
 	tid := trace.GetTraceID(ctx)
-	return logApp.Named(tid).Sugar()
+	if tid == "" {
+		return CurLogger()
+	}
+	return CurLogger().Named(tid)
 }
 
 // WithRouteColumn 返回一个仅“本次日志”生效的 logger，

@@ -34,9 +34,9 @@ func initDBIfPresent(a *App) {
 	// 1) 用户手动指定
 	if a.dbOption != nil && a.dbOption.FromUser {
 		if err := db.Init(a.dbOption.Opt); err != nil {
-			fmt.Println("❌ 数据库初始化失败(WithDB):", err)
+			fmt.Println("database initialization failed (WithDB):", err)
 		} else {
-			fmt.Println("✅ 数据库连接成功(WithDB)")
+			fmt.Println("database connection succeeded (WithDB)")
 		}
 		return
 	}
@@ -46,7 +46,7 @@ func initDBIfPresent(a *App) {
 	if conf.Dialect != "" && (conf.Host != "" || conf.Dialect == "sqlite") {
 		dsn, err := db.BuildDSN(conf.Dialect, conf.Host, conf.Port, conf.User, conf.Password, conf.DBName)
 		if err != nil {
-			fmt.Println("❌ 生成 DSN 失败:", err)
+			fmt.Println("failed to generate DSN:", err)
 			return
 		}
 		opt := db.Option{Dialect: conf.Dialect, DSN: dsn}

@@ -105,12 +105,12 @@ func InitConfig() {
 
 	err := viper.ReadInConfig()
 	if err != nil {
-		log.Fatalf("读取配置文件失败: %v", err)
+		log.Fatalf("failed to read config file: %v", err)
 	}
 
 	var config AppConfig
 	if err := viper.Unmarshal(&config); err != nil {
-		log.Fatalf("解析配置文件失败: %v", err)
+		log.Fatalf("failed to parse config file: %v", err)
 	}
 
 	Conf = &config
